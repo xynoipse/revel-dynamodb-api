@@ -1,6 +1,9 @@
 package app
 
 import (
+	"revel-dynamodb-api/app/database"
+
+	"github.com/guregu/dynamo"
 	"github.com/revel/revel"
 )
 
@@ -10,6 +13,12 @@ var (
 
 	// BuildTime revel app build-time (ldflags)
 	BuildTime string
+
+	// DB DynamoDB client
+	DB *dynamo.DB
+
+	// Table DynamoDB table
+	Table dynamo.Table
 )
 
 func init() {
@@ -31,11 +40,13 @@ func init() {
 	}
 
 	// Register startup functions with OnAppStart
-	// revel.DevMode and revel.RunMode only work inside of OnAppStart. See Example Startup Script
+	// revel.DevMode and revel.RunMode only work inside of OnAppStart.
 	// ( order dependent )
-	// revel.OnAppStart(ExampleStartupScript)
-	// revel.OnAppStart(InitDB)
-	// revel.OnAppStart(FillCache)
+
+	// Initialize DynamoDB client
+	revel.OnAppStart(func() {
+		DB, Table = database.DynamoDB()
+	})
 }
 
 // HeaderFilter adds common security headers
@@ -49,11 +60,3 @@ var HeaderFilter = func(c *revel.Controller, fc []revel.Filter) {
 
 	fc[0](c, fc[1:]) // Execute the next filter stage.
 }
-
-//func ExampleStartupScript() {
-//	// revel.DevMod and revel.RunMode work here
-//	// Use this script to check for dev mode and set dev/prod startup scripts here!
-//	if revel.DevMode == true {
-//		// Dev mode
-//	}
-//}
