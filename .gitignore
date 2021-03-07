@@ -1,0 +1,6 @@
+test-results/
+tmp/
+routes/
+log/
+target/
+none
